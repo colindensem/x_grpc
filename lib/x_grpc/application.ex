@@ -10,6 +10,8 @@ defmodule XGrpc.Application do
     children = [
       # Starts a worker by calling: XGrpc.Worker.start_link(arg)
       # {XGrpc.Worker, arg}
+      UserDB,
+      {GRPC.Server.Supervisor, {XGrpc.Endpoint, 5001}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
