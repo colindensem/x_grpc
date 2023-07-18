@@ -1,28 +1,58 @@
 # XGrpc
 
-**TODO: Add description**
+Exploration of gRPC in Elixir.
+
+We'll be using: [Elixir GRPC](https://github.com/elixir-grpc/grpc) and [Protobuf-elixir](https://github.com/elixir-protobuf/protobuf)
 
 ## Installation
 
-There are a couple of things that we require on our machine in order to properly develop and test our application.
-We'll first need to install protoc so that .proto files can be compiled appropriately.
-If you are on an OSX machine, you can run `brew install protobuf`, otherwise, see instructions specific to your platform.
-Now, with protoc available on your machine, you'll also want to install grpcurl so that you can interact with the application.
-Once again, if you are on an OSX machine, you can run `brew install grpcurl`, otherwise, check for instructions specific to your platform.
+To properly develop and test the application, the following dependencies need to be installed on your machine:
 
-Lastly, you'll want to run mix escript.install hex protobuf and ensure that protoc-gen-elixir script is available on your path (if you use ASDF as your runtime version manager, this requires running asdf reshim elixir).
+1. **protoc**: This is required to compile .proto files. If you are using an OSX machine, you can install it by running `brew install protobuf`. For other platforms, please refer to the specific instructions.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `x_grpc` to your list of dependencies in `mix.exs`:
+2. **grpcurl**: This tool allows you to interact with the application. On OSX, you can install it by running `brew install grpcurl`. For other platforms, please check the platform-specific instructions.
 
-```elixir
-def deps do
-  [
-    {:x_grpc, "~> 0.1.0"}
-  ]
-end
+3. **protoc-gen-elixir**: Run the command `mix escript.install hex protobuf` to install the protoc-gen-elixir script. Make sure it is available on your path. _If you use ASDF as your runtime version manager, you need to run `asdf reshim elixir` after installation._
+
+Make sure all the dependencies are successfully installed before proceeding with the development and testing of the application.
+## Usage
+
+Run `mix grpc.server` to start the server.
+
+The following should now work:
+
+```
+grpcurl -plaintext -proto x_grpc.proto -d '{"first_name": "Simon", "last_name": "Smith", "age": 40}' localhost:50051 x_grpc.User.Create
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/x_grpc>.
+```
+grpcurl -plaintext -proto x_grpc.proto -d '{"first_name": "Jane", "last_name": "Jones", "age": 45}' localhost:5001 x_grpc.User.Create
+```
+
+```
+grpcurl -plaintext -proto x_grpc.proto -d '{"id": 1}' localhost:5001 x_grpc.User.Get
+{
+  "firstName": "Simon",
+  "lastName": "Smith",
+  "age": 40
+}
+```
+
+```
+grpcurl -plaintext -proto x_grpc.proto -d '{"id": 2}' localhost:5001 x_grpc.User.Get
+{
+  "firstName": "Jane",
+  "lastName": "Jones",
+  "age": 45
+}
+
+```
+
+The following will produce an error:
+```
+grpcurl -plaintext -proto x_grpc.proto -d '{"id": 3}' localhost:5001 x_grpc.User.Get
+
+ERROR:
+  Code: NotFound
+  Message: Some requested entity (e.g., file or directory) was not found
+```
